@@ -40,25 +40,44 @@ var openai_1 = require("./openai");
 var express = require('express');
 var app = express();
 var PORT = process.env.PORT;
-app.get('/chatGPT', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
-    var _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+app.use(express.json());
+app.post('/chat-gpt/eldenring/names', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var prompt, response;
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                console.log(req);
+                prompt = req.body.prompt;
+                if (!!prompt) return [3 /*break*/, 1];
+                res.send('Invalid Prompt, Try Again');
+                return [3 /*break*/, 3];
+            case 1:
+                console.log(prompt);
                 return [4 /*yield*/, openai_1.openai.createChatCompletion({
                         model: 'gpt-3.5-turbo',
                         messages: [
-                            { role: 'system', content: 'You are a name generator' },
-                            { role: 'user', content: 'Generate a first and last name for a dark souls character using Twitch emotes' }
+                            {
+                                role: 'system',
+                                content: "You are a name generator. You generate first and last names given a theme. You only generate one name. Your generated names must be less than 16 total characters. You reply only the name in the form of a CamelCase string with no spaces between names. If you cannot do this your exact reply will be 'Error'"
+                            },
+                            {
+                                role: 'user',
+                                content: "Theme: ".concat(prompt)
+                            }
                         ]
                     })];
-            case 1:
-                response = _b.sent();
-                console.log((_a = response.data.choices[0].message) === null || _a === void 0 ? void 0 : _a.content);
-                res.send('ExpressTS server is running');
-                return [2 /*return*/];
+            case 2:
+                response = _c.sent();
+                if (!response.data.choices || !response.data.choices[0].message) {
+                    res.send('Server Error, Wait and Try Again');
+                }
+                else {
+                    console.log((_a = response.data.choices[0].message) === null || _a === void 0 ? void 0 : _a.content);
+                    console.log(response.data.choices);
+                    res.send((_b = response.data.choices[0].message) === null || _b === void 0 ? void 0 : _b.content);
+                }
+                _c.label = 3;
+            case 3: return [2 /*return*/];
         }
     });
 }); });
