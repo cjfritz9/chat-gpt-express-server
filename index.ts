@@ -1,9 +1,16 @@
 import { Express, Request, Response } from 'express';
 import { openai } from './openai';
+const cors = require('cors');
 const express = require('express');
 
-const app: Express = express();
-const PORT = process.env.PORT;
+export const app: Express = express();
+const PORT = process.env._PORT;
+
+app.use(
+  cors({
+    origin: 'https://eldencreator.com'
+  })
+);
 
 app.use(express.json());
 

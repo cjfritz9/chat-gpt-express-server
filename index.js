@@ -36,12 +36,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.app = void 0;
 var openai_1 = require("./openai");
+var cors = require('cors');
 var express = require('express');
-var app = express();
-var PORT = process.env.PORT;
-app.use(express.json());
-app.post('/chat-gpt/eldenring/names', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.app = express();
+var PORT = process.env._PORT;
+exports.app.use(cors({
+    origin: 'https://eldencreator.com'
+}));
+exports.app.use(express.json());
+exports.app.post('/chat-gpt/eldenring/names', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var prompt, response;
     var _a, _b;
     return __generator(this, function (_c) {
@@ -81,6 +86,6 @@ app.post('/chat-gpt/eldenring/names', function (req, res) { return __awaiter(voi
         }
     });
 }); });
-app.listen(PORT, function () {
+exports.app.listen(PORT, function () {
     console.log("Server is healthy");
 });
