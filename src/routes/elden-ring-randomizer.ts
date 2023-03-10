@@ -1,20 +1,9 @@
-import { Express, Request, Response } from 'express';
-import { openai } from './openai';
-const cors = require('cors');
+import { Request, Response } from 'express';
+import { openai } from '../openai';
 const express = require('express');
+const eldenRingRandomizer = express.Router();
 
-export const app: Express = express();
-const PORT = process.env._PORT;
-
-app.use(
-  cors({
-    origin: 'https://eldencreator.com'
-  })
-);
-
-app.use(express.json());
-
-app.post('/chat-gpt/eldenring/names', async (req: Request, res: Response) => {
+eldenRingRandomizer.post('/names', async (req: Request, res: Response) => {
   const prompt: string = req.body.prompt;
 
   if (!prompt) {
@@ -46,6 +35,4 @@ app.post('/chat-gpt/eldenring/names', async (req: Request, res: Response) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is healthy`);
-});
+export default eldenRingRandomizer;
