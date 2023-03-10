@@ -3,7 +3,7 @@ import cors from 'cors';
 export const app = express();
 const PORT = process.env._PORT;
 app.use(cors({
-    origin: 'https://eldencreator.com'
+    origin: '*'
 }));
 app.use(express.json());
 app.use((req, _res, next) => {
@@ -12,7 +12,7 @@ app.use((req, _res, next) => {
     console.log('<-----Body Logger End----->');
     next();
 });
-import apiRouter from '.';
+import apiRouter from './api.js';
 app.use('/api', apiRouter);
 app.listen(PORT, () => {
     console.log(`Server is healthy`);

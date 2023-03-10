@@ -1,6 +1,4 @@
-import { Express } from 'express';
-
-import express from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 
 export const app: Express = express();
@@ -8,7 +6,7 @@ const PORT = process.env._PORT;
 
 app.use(
   cors({
-    origin: 'https://eldencreator.com'
+    origin: '*'
   })
 );
 
@@ -22,7 +20,7 @@ app.use((req, _res, next) => {
   next();
 });
 
-import apiRouter from '.';
+import apiRouter from './api.js';
 app.use('/api', apiRouter);
 
 app.listen(PORT, () => {

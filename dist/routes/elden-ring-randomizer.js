@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { openai } from '../openai';
 import express from 'express';
+import { openai } from '../openai.js';
 const eldenRingRandomizer = express.Router();
 eldenRingRandomizer.post('/names', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;

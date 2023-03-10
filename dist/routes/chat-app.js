@@ -7,9 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { openai } from '../openai';
 import express from 'express';
+import { openai } from '../openai.js';
 const chatAppRouter = express.Router();
+chatAppRouter.get('/', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('get request to chat app');
+    res.send({ msg: 'request received' });
+}));
 chatAppRouter.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const body = req.body;
