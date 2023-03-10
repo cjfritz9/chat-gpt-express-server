@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Prompt } from '../models/elden-ring-randomizer/types';
 import { openai } from '../openai';
-const express = require('express');
+import express from 'express';
 const eldenRingRandomizer = express.Router();
 
 eldenRingRandomizer.post('/names', async (req: Request, res: Response) => {

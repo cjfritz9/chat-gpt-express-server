@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { openai } from '../openai';
-const express = require('express');
+import express from 'express';
 const chatAppRouter = express.Router();
 chatAppRouter.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
@@ -17,6 +17,7 @@ chatAppRouter.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, func
         res.send({ error: 'Invalid Request, Try Again' });
     }
     else {
+        console.log(body);
         const response = yield openai.createChatCompletion({
             model: 'gpt-3.5-turbo',
             messages: body

@@ -1,5 +1,5 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 export const app = express();
 const PORT = process.env._PORT;
 app.use(cors({
@@ -12,7 +12,7 @@ app.use((req, _res, next) => {
     console.log('<-----Body Logger End----->');
     next();
 });
-const apiRouter = require('./index');
+import apiRouter from '.';
 app.use('/api', apiRouter);
 app.listen(PORT, () => {
     console.log(`Server is healthy`);

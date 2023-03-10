@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const apiRouter = express.Router();
-const chatAppRouter = require('./routes/chat-app');
+import chatAppRouter from './routes/chat-app';
 apiRouter.use('/chat-app', chatAppRouter);
-const eldenRingRandomizer = require('./routes/chat-app');
+import eldenRingRandomizer from './routes/elden-ring-randomizer';
 apiRouter.use('/elden-ring-randomizer', eldenRingRandomizer);
 export default apiRouter;

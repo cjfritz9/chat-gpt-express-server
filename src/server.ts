@@ -1,7 +1,7 @@
 import { Express } from 'express';
 
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 
 export const app: Express = express();
 const PORT = process.env._PORT;
@@ -22,7 +22,7 @@ app.use((req, _res, next) => {
   next();
 });
 
-const apiRouter = require('./index');
+import apiRouter from '.';
 app.use('/api', apiRouter);
 
 app.listen(PORT, () => {
