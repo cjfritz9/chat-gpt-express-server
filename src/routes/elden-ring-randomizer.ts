@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
+import { Prompt } from '../models/elden-ring-randomizer/types';
 import { openai } from '../openai';
 const express = require('express');
 const eldenRingRandomizer = express.Router();
 
 eldenRingRandomizer.post('/names', async (req: Request, res: Response) => {
-  const prompt: string = req.body.prompt;
+  const prompt: Prompt = req.body.prompt;
 
   if (!prompt) {
     res.send('Invalid Prompt, Try Again');
