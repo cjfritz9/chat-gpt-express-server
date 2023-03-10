@@ -1,10 +1,27 @@
 import { Request, Response } from 'express';
+import { ChatRequest } from '../models/chat-app/types';
+import { openai } from '../openai';
 const express = require('express');
 const chatAppRouter = express.Router();
 
 chatAppRouter.post('/send', async (req: Request, res: Response) => {
-  console.log(req.body);
-  res.send({ msg: 'working' });
+  const body: ChatRequest = req.body;
+
+  if (!body[1]) {
+    res.send({ error: 'Invalid Request, Try Again' });
+  } else {
+    const response = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: body
+    });
+    if (!response.data.choices || !response.data.choices[0].message) {
+      res.send('Server Error, Wait and Try Again');
+    } else {
+      console.log(response.data.choices[0].message?.content);
+      console.log(response.data.choices);
+      res.send(response.data.choices[0].message?.content);
+    }
+  }
 });
 
 export default chatAppRouter;
