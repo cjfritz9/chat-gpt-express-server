@@ -2,7 +2,7 @@ import express, { Express } from 'express';
 import cors from 'cors';
 
 export const app: Express = express();
-const PORT = process.env._PORT;
+const PORT = process.env._PORT || 8080;
 
 app.use(
   cors({
@@ -21,8 +21,9 @@ app.use((req, _res, next) => {
 });
 
 import apiRouter from './api.js';
+
 app.use('/api', apiRouter);
 
 app.listen(PORT, () => {
-  console.log(`Server is healthy`);
+  console.log(`Server is listening on port: ${PORT}`);
 });
