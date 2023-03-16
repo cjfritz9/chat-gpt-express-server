@@ -1,12 +1,7 @@
 import express, { Request, Response } from 'express';
-import { ChatRequest } from '../models/chat-app/types';
-import { openai } from '../openai.js';
-const chatAppRouter = express.Router();
-
-chatAppRouter.get('/', async (_req: Request, res: Response) => {
-  console.log('get request to chat app')
-  res.send({ msg: 'request received' });
-});
+import { ChatRequest } from '../../models/chat-app/types';
+import { openai } from '../../openai.js';
+import chatAppRouter from './index.js';
 
 chatAppRouter.post('/send', async (req: Request, res: Response) => {
   const body: ChatRequest = req.body;
@@ -14,7 +9,6 @@ chatAppRouter.post('/send', async (req: Request, res: Response) => {
   if (!body[1]) {
     res.send({ error: 'Invalid Request, Try Again' });
   } else {
-    console.log(body);
     const response = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages: body

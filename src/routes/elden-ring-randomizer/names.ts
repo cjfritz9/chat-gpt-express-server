@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { Prompt } from '../models/elden-ring-randomizer/types';
-import { openai } from '../openai.js';
+import { Prompt } from '../../models/elden-ring-randomizer/types';
+import { openai } from '../../openai.js';
 const eldenRingRandomizer = express.Router();
 
 eldenRingRandomizer.post('/names', async (req: Request, res: Response) => {
@@ -9,8 +9,6 @@ eldenRingRandomizer.post('/names', async (req: Request, res: Response) => {
   if (!prompt) {
     res.send('Invalid Prompt, Try Again');
   } else {
-    console.log(prompt);
-
     const response = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages: [
@@ -28,8 +26,6 @@ eldenRingRandomizer.post('/names', async (req: Request, res: Response) => {
     if (!response.data.choices || !response.data.choices[0].message) {
       res.send('Server Error, Wait and Try Again');
     } else {
-      console.log(response.data.choices[0].message?.content);
-      console.log(response.data.choices);
       res.send(response.data.choices[0].message?.content);
     }
   }
