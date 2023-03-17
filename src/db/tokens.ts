@@ -11,7 +11,7 @@ export const addTokensByUserId = async (userId: number) => {
     }: UserData = await pool.query(
       `
           UPDATE users
-          SET tokens = ${15}
+          SET tokens = ${10}
           WHERE id = ${userId}
           RETURNING *;
         `
@@ -53,7 +53,7 @@ const canAddTokensToUser = async (userId: number) => {
     );
 
     const currentDate = new Date().getDay();
-    const lastTokenRefreshDate = new Date(user.lastTokenRefresh).getDay();
+    const lastTokenRefreshDate = new Date(user.last_token_refresh).getDay();
 
     if (!user || !user.id) return 'No User Found';
 

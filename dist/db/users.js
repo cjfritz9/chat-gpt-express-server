@@ -11,16 +11,24 @@ import pool from './pool.js';
 import bcrypt from 'bcrypt';
 export const createUser = ({ email, password }) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (!email || !password) {
+            return 'Error: Missing required Email/Password';
+        }
         const SALT_COUNT = 10;
         const hashedPassword = yield bcrypt.hash(password, SALT_COUNT);
         const registrationTime = Date();
         const { rows: [user] } = yield pool.query(`
-        INSERT INTO USERS (email, password, tokens, lastTokenRefresh),
-        VALUES (${email}, ${hashedPassword}, ${10}, ${registrationTime}),
+        INSERT INTO USERS (email, password, tokens, last_token_refresh)
+        VALUES ('${email}', '${hashedPassword}', ${10}, '${registrationTime}')
         ON CONFLICT (email) DO NOTHING
         RETURNING *;
       `);
-        return user;
+        return {
+            id: user.id,
+            email: user.email,
+            tokens: user.tokens,
+            last_token_refresh: user.last_token_refresh
+        };
     }
     catch (err) {
         console.error(err);
@@ -35,12 +43,12 @@ export const getUserById = (userId) => __awaiter(void 0, void 0, void 0, functio
         WHERE id = ${userId}
       `);
         if (!user)
-            return 'No user found';
+            return 'Error: No user found';
         return {
             id: user.id,
             email: user.email,
             tokens: user.tokens,
-            lastTokenRefresh: user.lastTokenRefresh
+            last_token_refresh: user.last_token_refresh
         };
     }
     catch (err) {
@@ -56,18 +64,18 @@ export const authenticateUser = ({ email, password }) => __awaiter(void 0, void 
         WHERE email = '${email}'
       `);
         if (!user)
-            return 'No user found';
+            return 'Error: No user found';
         const passwordMatch = yield bcrypt.compare(password, user.password);
         if (passwordMatch) {
             return {
                 id: user.id,
                 email: user.email,
                 tokens: user.tokens,
-                lastTokenRefresh: user.lastTokenRefresh
+                last_token_refresh: user.last_token_refresh
             };
         }
         else {
-            return 'Invalid Password';
+            return 'Error: Invalid Password';
         }
     }
     catch (err) {

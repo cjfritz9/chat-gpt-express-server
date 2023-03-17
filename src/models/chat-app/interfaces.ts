@@ -4,7 +4,7 @@ interface UserData {
     email: string;
     password: string;
     tokens: number;
-    lastTokenRefresh: string;
+    last_token_refresh: string;
   }[]
 }
 

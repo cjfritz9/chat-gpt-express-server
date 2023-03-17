@@ -15,7 +15,7 @@ export const addTokensByUserId = (userId) => __awaiter(void 0, void 0, void 0, f
         }
         const { rows: [user] } = yield pool.query(`
           UPDATE users
-          SET tokens = ${15}
+          SET tokens = ${10}
           WHERE id = ${userId}
           RETURNING *;
         `);
@@ -48,7 +48,7 @@ const canAddTokensToUser = (userId) => __awaiter(void 0, void 0, void 0, functio
             WHERE id = ${userId};
           `);
         const currentDate = new Date().getDay();
-        const lastTokenRefreshDate = new Date(user.lastTokenRefresh).getDay();
+        const lastTokenRefreshDate = new Date(user.last_token_refresh).getDay();
         if (!user || !user.id)
             return 'No User Found';
         if (currentDate !== lastTokenRefreshDate) {

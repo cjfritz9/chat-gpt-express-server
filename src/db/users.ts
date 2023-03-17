@@ -4,21 +4,30 @@ import UserData, { AccountFields } from '../models/chat-app/interfaces';
 
 export const createUser = async ({ email, password }: AccountFields) => {
   try {
+    if (!email || !password) {
+      return 'Error: Missing required Email/Password'
+    }
     const SALT_COUNT = 10;
     const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
-    const registrationTime = Date();
+    const registrationTime = Date();    
 
     const {
       rows: [user]
     } = await pool.query(
       `
-        INSERT INTO USERS (email, password, tokens, lastTokenRefresh),
-        VALUES (${email}, ${hashedPassword}, ${10}, ${registrationTime}),
+        INSERT INTO USERS (email, password, tokens, last_token_refresh)
+        VALUES ('${email}', '${hashedPassword}', ${10}, '${registrationTime}')
         ON CONFLICT (email) DO NOTHING
         RETURNING *;
       `
     );
-    return user;
+
+    return {
+      id: user.id,
+      email: user.email,
+      tokens: user.tokens,
+      last_token_refresh: user.last_token_refresh
+    };
   } catch (err) {
     console.error(err);
     return 'Database Error: Check logs';
@@ -36,12 +45,12 @@ export const getUserById = async (userId: number) => {
         WHERE id = ${userId}
       `
     );
-    if (!user) return 'No user found';
+    if (!user) return 'Error: No user found';
     return {
       id: user.id,
       email: user.email,
       tokens: user.tokens,
-      lastTokenRefresh: user.lastTokenRefresh
+      last_token_refresh: user.last_token_refresh
     };
   } catch (err) {
     console.error(err);
@@ -60,7 +69,7 @@ export const authenticateUser = async ({ email, password }: AccountFields) => {
         WHERE email = '${email}'
       `
     );
-    if (!user) return 'No user found';
+    if (!user) return 'Error: No user found';
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (passwordMatch) {
@@ -68,10 +77,10 @@ export const authenticateUser = async ({ email, password }: AccountFields) => {
         id: user.id,
         email: user.email,
         tokens: user.tokens,
-        lastTokenRefresh: user.lastTokenRefresh
+        last_token_refresh: user.last_token_refresh
       };
     } else {
-      return 'Invalid Password';
+      return 'Error: Invalid Password';
     }
   } catch (err) {
     console.error(err);
