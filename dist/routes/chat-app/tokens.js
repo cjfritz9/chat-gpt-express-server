@@ -8,12 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import express from 'express';
-import { authenticateUser, createUser, getUserById } from '../../db/users.js';
-const usersRouter = express.Router();
-usersRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+import { getTokensByUserId, refreshTokensByUserId, spendTokensByUserId } from '../../db/tokens.js';
+const tokensRouter = express.Router();
+tokensRouter.get('/:userId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
-        const response = yield getUserById(+id);
+        const { userId } = req.params;
+        const response = yield getTokensByUserId(+userId);
         if (typeof response === 'string') {
             const error = response;
             res.send({
@@ -23,8 +23,8 @@ usersRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function
         else {
             const user = response;
             res.send({
-                success: `User ${id} found`,
-                user
+                success: `User ${userId} found`,
+                availableTokens: user.tokens
             });
         }
     }
@@ -35,11 +35,12 @@ usersRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
 }));
-usersRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+tokensRouter.post('/subtract', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, password } = req.body;
-        console.log('at users/login', req.body);
-        const response = yield authenticateUser({ email, password });
+        const { userId, amount } = req.body;
+        const response = amount === undefined
+            ? yield spendTokensByUserId(+userId)
+            : yield spendTokensByUserId(+userId, amount);
         if (typeof response === 'string') {
             const error = response;
             res.send({
@@ -49,8 +50,8 @@ usersRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, funct
         else {
             const user = response;
             res.send({
-                success: 'Authentication successful',
-                user
+                success: `User ${userId} found`,
+                remainingTokens: user.tokens
             });
         }
     }
@@ -61,10 +62,10 @@ usersRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
-usersRouter.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+tokensRouter.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, password } = req.body;
-        const response = yield createUser({ email, password });
+        const { userId } = req.body;
+        const response = yield refreshTokensByUserId({ userId: +userId });
         if (typeof response === 'string') {
             const error = response;
             res.send({
@@ -74,8 +75,8 @@ usersRouter.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, fu
         else {
             const user = response;
             res.send({
-                success: 'Registration successful',
-                user
+                success: `User ${userId} found`,
+                remainingTokens: user.tokens
             });
         }
     }
@@ -86,4 +87,4 @@ usersRouter.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, fu
         });
     }
 }));
-export default usersRouter;
+export default tokensRouter;

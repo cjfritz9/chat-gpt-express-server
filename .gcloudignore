@@ -13,6 +13,7 @@
 .git
 .gitignore
 src
+dist/test
 
 # Node.js dependencies:
 node_modules/

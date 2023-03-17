@@ -5,11 +5,14 @@ import UserData, { AccountFields } from '../models/chat-app/interfaces';
 export const createUser = async ({ email, password }: AccountFields) => {
   try {
     if (!email || !password) {
-      return 'Error: Missing required Email/Password'
+      return 'Error: Missing required Email/Password';
+    }
+    if ((await isEmailTaken(email)) === true) {
+      return 'Error: Email address is taken'
     }
     const SALT_COUNT = 10;
     const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
-    const registrationTime = Date();    
+    const registrationTime = Date();
 
     const {
       rows: [user]
@@ -42,7 +45,7 @@ export const getUserById = async (userId: number) => {
       `
         SELECT *
         FROM users
-        WHERE id = ${userId}
+        WHERE id = ${userId};
       `
     );
     if (!user) return 'Error: No user found';
@@ -66,7 +69,7 @@ export const authenticateUser = async ({ email, password }: AccountFields) => {
       `
         SELECT *
         FROM users
-        WHERE email = '${email}'
+        WHERE email = '${email}';
       `
     );
     if (!user) return 'Error: No user found';
@@ -81,6 +84,28 @@ export const authenticateUser = async ({ email, password }: AccountFields) => {
       };
     } else {
       return 'Error: Invalid Password';
+    }
+  } catch (err) {
+    console.error(err);
+    return 'Database Error: Check logs';
+  }
+};
+
+const isEmailTaken = async (email: string) => {
+  try {
+    const {
+      rows: [user]
+    }: UserData = await pool.query(
+      `
+        SELECT *
+        FROM users
+        WHERE email = '${email}';
+      `
+    );
+    if (user) {
+      return true;
+    } else {
+      return false;
     }
   } catch (err) {
     console.error(err);

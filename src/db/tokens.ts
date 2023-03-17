@@ -38,8 +38,8 @@ export const refreshTokensByUserId = async ({
   userId,
   adminOverride = false
 }: {
-  userId: number;
-  adminOverride: boolean;
+    userId: number;
+    adminOverride?: boolean;
 }) => {
   try {
     if (

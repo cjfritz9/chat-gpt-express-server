@@ -14,6 +14,9 @@ export const createUser = ({ email, password }) => __awaiter(void 0, void 0, voi
         if (!email || !password) {
             return 'Error: Missing required Email/Password';
         }
+        if ((yield isEmailTaken(email)) === true) {
+            return 'Error: Email address is taken';
+        }
         const SALT_COUNT = 10;
         const hashedPassword = yield bcrypt.hash(password, SALT_COUNT);
         const registrationTime = Date();
@@ -40,7 +43,7 @@ export const getUserById = (userId) => __awaiter(void 0, void 0, void 0, functio
         const { rows: [user] } = yield pool.query(`
         SELECT *
         FROM users
-        WHERE id = ${userId}
+        WHERE id = ${userId};
       `);
         if (!user)
             return 'Error: No user found';
@@ -61,7 +64,7 @@ export const authenticateUser = ({ email, password }) => __awaiter(void 0, void 
         const { rows: [user] } = yield pool.query(`
         SELECT *
         FROM users
-        WHERE email = '${email}'
+        WHERE email = '${email}';
       `);
         if (!user)
             return 'Error: No user found';
@@ -76,6 +79,25 @@ export const authenticateUser = ({ email, password }) => __awaiter(void 0, void 
         }
         else {
             return 'Error: Invalid Password';
+        }
+    }
+    catch (err) {
+        console.error(err);
+        return 'Database Error: Check logs';
+    }
+});
+const isEmailTaken = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { rows: [user] } = yield pool.query(`
+        SELECT *
+        FROM users
+        WHERE email = '${email}';
+      `);
+        if (user) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
     catch (err) {

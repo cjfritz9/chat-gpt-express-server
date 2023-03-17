@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { ChatRequest } from '../../models/chat-app/types';
 import { openai } from '../../openai.js';
 import chatAppRouter from './index.js';
