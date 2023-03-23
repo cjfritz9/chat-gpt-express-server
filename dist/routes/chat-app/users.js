@@ -38,7 +38,6 @@ usersRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function
 usersRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        console.log('at users/login', req.body);
         const response = yield authenticateUser({ email, password });
         if (typeof response === 'string') {
             const error = response;

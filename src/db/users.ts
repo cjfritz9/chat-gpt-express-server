@@ -8,7 +8,7 @@ export const createUser = async ({ email, password }: AccountFields) => {
       return 'Error: Missing required Email/Password';
     }
     if ((await isEmailTaken(email)) === true) {
-      return 'Error: Email address is taken'
+      return 'Error: Email address is taken';
     }
     const SALT_COUNT = 10;
     const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
@@ -67,9 +67,9 @@ export const authenticateUser = async ({ email, password }: AccountFields) => {
       rows: [user]
     }: UserData = await pool.query(
       `
-        SELECT *
-        FROM users
-        WHERE email = '${email}';
+      SELECT *
+      FROM users
+      WHERE email = '${email}';
       `
     );
     if (!user) return 'Error: No user found';

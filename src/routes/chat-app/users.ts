@@ -29,9 +29,7 @@ usersRouter.get('/:id', async (req: Request, res: Response) => {
 
 usersRouter.post('/login', async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-    console.log('at users/login', req.body);
-    
+    const { email, password } = req.body;  
 
     const response = await authenticateUser({ email, password });
     if (typeof response === 'string') {

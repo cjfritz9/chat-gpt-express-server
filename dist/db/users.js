@@ -62,9 +62,9 @@ export const getUserById = (userId) => __awaiter(void 0, void 0, void 0, functio
 export const authenticateUser = ({ email, password }) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { rows: [user] } = yield pool.query(`
-        SELECT *
-        FROM users
-        WHERE email = '${email}';
+      SELECT *
+      FROM users
+      WHERE email = '${email}';
       `);
         if (!user)
             return 'Error: No user found';

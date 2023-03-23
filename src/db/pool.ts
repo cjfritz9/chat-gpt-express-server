@@ -2,18 +2,21 @@ import dotenv from 'dotenv';
 import pkg from 'pg';
 dotenv.config();
 
-const connectionString = process.env.NODE_ENV === 'production'
-? process.env.DB_URL
-: 'https://localhost:5432/chat-app';
-
 const { Pool } = pkg;
 
-const pool = new Pool({
-  connectionString,
-  ssl:
-    process.env.NODE_ENV === 'production'
-      ? { rejectUnauthorized: false }
-      : undefined
-});
+const pool = new Pool(
+  process.env.NODE_ENV === 'production'
+    ? {
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PW,
+        port: 5432
+      }
+    : {
+        connectionString: 'https://localhost:5432/chat-app',
+        ssl: undefined
+      }
+);
 
 export default pool;
