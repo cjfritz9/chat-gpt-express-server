@@ -43,7 +43,7 @@ export const refreshTokensByUserId = ({ userId, adminOverride = false }) => __aw
         }
         const { rows: [user] } = yield pool.query(`
           UPDATE users
-          SET tokens = 10
+          SET tokens = 10, last_token_refresh = '${Date()}'
           WHERE id = ${userId}
           RETURNING *;
         `);
