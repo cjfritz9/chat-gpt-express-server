@@ -7,9 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import express from 'express';
 import { openai } from '../../openai.js';
-import chatAppRouter from './index.js';
-chatAppRouter.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const messagesRouter = express.Router();
+messagesRouter.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const body = req.body;
     if (!body[1]) {
@@ -21,13 +22,13 @@ chatAppRouter.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, func
             messages: body
         });
         if (!response.data.choices || !response.data.choices[0].message) {
-            res.send('Server Error, Wait and Try Again');
+            res.send({ error: 'Server Error, Wait and Try Again' });
         }
         else {
             console.log((_a = response.data.choices[0].message) === null || _a === void 0 ? void 0 : _a.content);
             console.log(response.data.choices);
-            res.send((_b = response.data.choices[0].message) === null || _b === void 0 ? void 0 : _b.content);
+            res.send({ success: (_b = response.data.choices[0].message) === null || _b === void 0 ? void 0 : _b.content });
         }
     }
 }));
-export default chatAppRouter;
+export default messagesRouter;

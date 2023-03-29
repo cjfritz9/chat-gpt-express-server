@@ -6,6 +6,9 @@ chatAppRouter.use(cors({
   origin: '*'
 }))
 
+import messagesRouter from './messages.js';
+chatAppRouter.use('/messages', messagesRouter);
+
 import usersRouter from './users.js';
 chatAppRouter.use('/users', usersRouter);
 

@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import { ChatRequest } from '../../models/chat-app/types';
 import { openai } from '../../openai.js';
-import chatAppRouter from './index.js';
+const messagesRouter = express.Router();
 
-chatAppRouter.post('/send', async (req: Request, res: Response) => {
+messagesRouter.post('/send', async (req: Request, res: Response) => {
   const body: ChatRequest = req.body;
 
   if (!body[1]) {
@@ -14,13 +14,13 @@ chatAppRouter.post('/send', async (req: Request, res: Response) => {
       messages: body
     });
     if (!response.data.choices || !response.data.choices[0].message) {
-      res.send('Server Error, Wait and Try Again');
+      res.send({ error: 'Server Error, Wait and Try Again' });
     } else {
       console.log(response.data.choices[0].message?.content);
       console.log(response.data.choices);
-      res.send(response.data.choices[0].message?.content);
+      res.send({ success: response.data.choices[0].message?.content });
     }
   }
 });
 
-export default chatAppRouter;
+export default messagesRouter;
