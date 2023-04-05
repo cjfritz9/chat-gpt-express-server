@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import pkg from 'pg';
 dotenv.config();
 const { Pool } = pkg;
+console.log('un: ', process.env.DB_USER, 'pw: ', process.env.DB_PW);
 const pool = new Pool(process.env.NODE_ENV === 'production'
     ? {
         host: process.env.DB_HOST,
