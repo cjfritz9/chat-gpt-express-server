@@ -13,8 +13,14 @@ app.use(
 app.use(express.json());
 
 app.use((req, _res, next) => {
+  const bodyCopy = { ...req.body };
+  if (bodyCopy.password) {
+    bodyCopy.password = 'hidden';
+  }
+
   console.log('<-----Body Logger Start----->');
-  console.log(req.body);
+  console.log('Received: ', new Date().toLocaleString());
+  console.log('Request Body: ', bodyCopy);
   console.log('<-----Body Logger End----->');
 
   next();
