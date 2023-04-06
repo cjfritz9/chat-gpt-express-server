@@ -101,12 +101,12 @@ const canAddTokensToUser = async (userId: number) => {
           `
     );
 
-    const currentDate = new Date().getDay();
-    const lastTokenRefreshDate = new Date(user.last_token_refresh).getDay();
+    const currentTime = new Date().getTime();
+    const lastTokenRefreshTime = new Date(user.last_token_refresh).getTime();
 
     if (!user || !user.id) return 'No User Found';
 
-    if (currentDate !== lastTokenRefreshDate) {
+    if (currentTime - 86400000 >= lastTokenRefreshTime) {
       return true;
     } else {
       return false;
