@@ -74,9 +74,10 @@ tokensRouter.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
         else {
             const user = response;
+            console.log(user);
             res.send({
-                success: `User ${userId} found`,
-                remainingTokens: user.tokens
+                success: `Tokens added for user ${userId}`,
+                user
             });
         }
     }

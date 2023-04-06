@@ -70,9 +70,10 @@ tokensRouter.post('/add', async (req: Request, res: Response) => {
       });
     } else {
       const user = response;
+      console.log(user)
       res.send({
-        success: `User ${userId} found`,
-        remainingTokens: user.tokens
+        success: `Tokens added for user ${userId}`,
+        user
       });
     }
   } catch (err) {
