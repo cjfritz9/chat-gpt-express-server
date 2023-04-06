@@ -82,11 +82,11 @@ const canAddTokensToUser = (userId) => __awaiter(void 0, void 0, void 0, functio
             FROM users
             WHERE id = ${userId};
           `);
-        const currentDate = new Date().getDay();
-        const lastTokenRefreshDate = new Date(user.last_token_refresh).getDay();
+        const currentTime = new Date().getTime();
+        const lastTokenRefreshTime = new Date(user.last_token_refresh).getTime();
         if (!user || !user.id)
             return 'No User Found';
-        if (currentDate !== lastTokenRefreshDate) {
+        if (currentTime - 86400000 >= lastTokenRefreshTime) {
             return true;
         }
         else {
