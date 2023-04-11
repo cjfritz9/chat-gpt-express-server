@@ -27,9 +27,12 @@ app.use((req, _res, next) => {
 });
 
 import apiRouter from './api.js';
+import { getUserByEmail } from './db/users-fs.js';
 
 app.use('/api', apiRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is listening on port: ${PORT}`);
+  const res = await getUserByEmail('dev.cjfritz@gmail.com');
+  console.log('final user response: ', res)
 });
