@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { expect } from 'chai';
-import * as UF from '../../db/users.js';
+import * as UF from '../../db/postgres-old-db/users-pg.js';
 describe('User DB Functions Tests', () => {
     describe('Create User', () => {
         it('Creates a new user & returns their details when all given information is valid', () => __awaiter(void 0, void 0, void 0, function* () {

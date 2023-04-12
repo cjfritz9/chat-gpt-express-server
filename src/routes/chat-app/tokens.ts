@@ -1,5 +1,9 @@
 import express, { Request, Response } from 'express';
-import { getTokensByUserId, refreshTokensByUserId, spendTokensByUserId } from '../../db/tokens.js';
+import {
+  getTokensByUserId,
+  refreshTokensByUserId,
+  spendTokensByUserId
+} from '../../db/tokens.js';
 
 const tokensRouter = express.Router();
 
@@ -7,7 +11,7 @@ tokensRouter.get('/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
-    const response = await getTokensByUserId(+userId);
+    const response = await getTokensByUserId(userId);
     if (typeof response === 'string') {
       const error = response;
       res.send({
@@ -34,9 +38,9 @@ tokensRouter.post('/subtract', async (req: Request, res: Response) => {
 
     const response =
       amount === undefined
-        ? await spendTokensByUserId(+userId)
-        : await spendTokensByUserId(+userId, amount);
-    
+        ? await spendTokensByUserId(userId)
+        : await spendTokensByUserId(userId, amount);
+
     if (typeof response === 'string') {
       const error = response;
       res.send({
@@ -61,8 +65,8 @@ tokensRouter.post('/add', async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
 
-    const response = await refreshTokensByUserId({userId: +userId});
-    
+    const response = await refreshTokensByUserId({ userId });
+
     if (typeof response === 'string') {
       const error = response;
       res.send({
@@ -70,7 +74,7 @@ tokensRouter.post('/add', async (req: Request, res: Response) => {
       });
     } else {
       const user = response;
-      console.log(user)
+      console.log(user);
       res.send({
         success: `Tokens added for user ${userId}`,
         user

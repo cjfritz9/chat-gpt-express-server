@@ -1,12 +1,16 @@
 import express, { Request, Response } from 'express';
-import { authenticateUser, createUser, getUserById } from '../../db/users.js';
+import {
+  authenticateUser,
+  createUser,
+  getUserById
+} from '../../db/users.js';
 const usersRouter = express.Router();
 
 usersRouter.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const response = await getUserById(+id);
+    const response = await getUserById(id);
     if (typeof response === 'string') {
       const error = response;
       res.send({
@@ -29,7 +33,7 @@ usersRouter.get('/:id', async (req: Request, res: Response) => {
 
 usersRouter.post('/login', async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;  
+    const { email, password } = req.body;
 
     const response = await authenticateUser({ email, password });
     if (typeof response === 'string') {

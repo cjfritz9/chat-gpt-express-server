@@ -1,6 +1,6 @@
-import pool from './pool.js';
+import { AccountFields } from '../models/chat-app/interfaces';
 import bcrypt from 'bcrypt';
-import UserData, { AccountFields } from '../models/chat-app/interfaces';
+import db from './db.js';
 
 export const createUser = async ({ email, password }: AccountFields) => {
   try {
@@ -14,22 +14,19 @@ export const createUser = async ({ email, password }: AccountFields) => {
     const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
     const registrationTime = Date();
 
-    const {
-      rows: [user]
-    } = await pool.query(
-      `
-        INSERT INTO USERS (email, password, tokens, last_token_refresh)
-        VALUES ('${email}', '${hashedPassword}', ${10}, '${registrationTime}')
-        ON CONFLICT (email) DO NOTHING
-        RETURNING *;
-      `
-    );
+    const users: any = db.collection('users');
+    const res: any = await users.add({
+      email,
+      password: hashedPassword,
+      tokens: 10,
+      last_token_refresh: registrationTime
+    });
 
     return {
-      id: user.id,
-      email: user.email,
-      tokens: user.tokens,
-      last_token_refresh: user.last_token_refresh
+      id: res.id,
+      email,
+      tokens: 10,
+      last_token_refresh: registrationTime
     };
   } catch (err) {
     console.error(err);
@@ -37,24 +34,37 @@ export const createUser = async ({ email, password }: AccountFields) => {
   }
 };
 
-export const getUserById = async (userId: number) => {
+export const getUserById = async (userId: string) => {
   try {
-    const {
-      rows: [user]
-    }: UserData = await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE id = ${userId};
-      `
-    );
-    if (!user) return 'Error: No user found';
-    return {
-      id: user.id,
-      email: user.email,
-      tokens: user.tokens,
-      last_token_refresh: user.last_token_refresh
-    };
+    const docRef: any = db.collection('users').doc(userId);
+    const userDoc: any = await docRef.get();
+
+    if (userDoc.empty) return 'Error: No user found';
+
+    let user = userDoc.data();
+    Object.assign(user, { id: userDoc.id });
+    delete user.password;
+
+    return user;
+  } catch (err) {
+    console.error(err);
+    return 'Database Error: Check logs';
+  }
+};
+
+export const getUserByEmail = async (email: string) => {
+  try {
+    const users: any = db.collection('users');
+    const snapshot: any = await users.where('email', '==', email).get();
+
+    if (!snapshot) return 'Error: No user found';
+    let user: any = {};
+    snapshot.forEach((doc: any) => {
+      Object.assign(user, { id: doc.id });
+      Object.assign(user, doc.data());
+      delete user.password;
+    });
+    return user;
   } catch (err) {
     console.error(err);
     return 'Database Error: Check logs';
@@ -63,16 +73,17 @@ export const getUserById = async (userId: number) => {
 
 export const authenticateUser = async ({ email, password }: AccountFields) => {
   try {
-    const {
-      rows: [user]
-    }: UserData = await pool.query(
-      `
-      SELECT *
-      FROM users
-      WHERE email = '${email}';
-      `
-    );
-    if (!user) return 'Error: No user found';
+    const users: any = db.collection('users');
+    const userDoc: any = await users.where('email', '==', email).get();
+    if (userDoc.empty) {
+      return 'Error: No user found';
+    }
+
+    let user: any = {};
+    userDoc.forEach((doc: any) => {
+      Object.assign(user, { id: doc.id });
+      Object.assign(user, doc.data());
+    });
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (passwordMatch) {
@@ -93,19 +104,12 @@ export const authenticateUser = async ({ email, password }: AccountFields) => {
 
 const isEmailTaken = async (email: string) => {
   try {
-    const {
-      rows: [user]
-    }: UserData = await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE email = '${email}';
-      `
-    );
-    if (user) {
-      return true;
-    } else {
+    const users: any = db.collection('users');
+    const userDoc: any = await users.where('email', '==', email).get();
+    if (userDoc.empty) {
       return false;
+    } else {
+      return true;
     }
   } catch (err) {
     console.error(err);

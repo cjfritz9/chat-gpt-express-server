@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import * as TF from '../../db/tokens.js';
-import * as UF from '../../db/users.js';
+import * as TF from '../../db/postgres-old-db/tokens-pg.js';
+import * as UF from '../../db/postgres-old-db/users-pg.js';
 
 describe('User DB Functions Tests', () => {
   describe('Spend Token By User ID', () => {

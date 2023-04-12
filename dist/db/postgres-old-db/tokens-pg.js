@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import db from './db.js';
-import { getUserById } from './users.js';
+import pool from './pool-pg.js';
+import { getUserById } from './users-pg.js';
 export const spendTokensByUserId = (userId, spentTokenAmount = 1) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const currentUser = yield getUserById(userId);
@@ -17,17 +17,17 @@ export const spendTokensByUserId = (userId, spentTokenAmount = 1) => __awaiter(v
         if (currentUser.tokens < spentTokenAmount) {
             return 'Error: User has insufficient tokens';
         }
-        yield db
-            .collection('users')
-            .doc(userId)
-            .update({
-            tokens: currentUser.tokens - spentTokenAmount
-        });
+        const { rows: [user] } = yield pool.query(`
+          UPDATE users
+          SET tokens = tokens - ${spentTokenAmount}
+          WHERE id = ${userId}
+          RETURNING *;
+        `);
         return {
-            id: currentUser.id,
-            email: currentUser.email,
-            tokens: currentUser.tokens - spentTokenAmount,
-            last_token_refresh: currentUser.last_token_refresh
+            id: user.id,
+            email: user.email,
+            tokens: user.tokens,
+            last_token_refresh: user.last_token_refresh
         };
     }
     catch (err) {
@@ -41,11 +41,18 @@ export const refreshTokensByUserId = ({ userId, adminOverride = false }) => __aw
             adminOverride === false) {
             return 'Unable to add tokens. Try again tomorrow';
         }
-        yield db.collection('users').doc(userId).update({
-            tokens: 10,
-            last_token_refresh: Date()
-        });
-        return yield getUserById(userId);
+        const { rows: [user] } = yield pool.query(`
+          UPDATE users
+          SET tokens = 10, last_token_refresh = '${Date()}'
+          WHERE id = ${userId}
+          RETURNING *;
+        `);
+        return {
+            id: user.id,
+            email: user.email,
+            tokens: user.tokens,
+            last_token_refresh: user.last_token_refresh
+        };
     }
     catch (err) {
         console.error(err);
@@ -54,7 +61,11 @@ export const refreshTokensByUserId = ({ userId, adminOverride = false }) => __aw
 });
 export const getTokensByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = getUserById(userId);
+        const { rows: [user] } = yield pool.query(`
+        SELECT *
+        FROM users
+        WHERE id = ${userId}
+      `);
         if (!user)
             return 'Error: User not found';
         return user;
@@ -66,7 +77,11 @@ export const getTokensByUserId = (userId) => __awaiter(void 0, void 0, void 0, f
 });
 const canAddTokensToUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield getUserById(userId);
+        const { rows: [user] } = yield pool.query(`
+            SELECT *
+            FROM users
+            WHERE id = ${userId};
+          `);
         const currentTime = new Date().getTime();
         const lastTokenRefreshTime = new Date(user.last_token_refresh).getTime();
         if (!user || !user.id)

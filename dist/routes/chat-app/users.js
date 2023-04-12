@@ -13,7 +13,7 @@ const usersRouter = express.Router();
 usersRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const response = yield getUserById(+id);
+        const response = yield getUserById(id);
         if (typeof response === 'string') {
             const error = response;
             res.send({

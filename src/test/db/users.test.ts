@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as UF from '../../db/users.js';
+import * as UF from '../../db/postgres-old-db/users-pg.js';
 
 describe('User DB Functions Tests', () => {
   describe('Create User', () => {

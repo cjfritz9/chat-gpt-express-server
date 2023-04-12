@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import pool from './pool-pg.js';
 import bcrypt from 'bcrypt';
-import db from './db.js';
 export const createUser = ({ email, password }) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!email || !password) {
@@ -20,18 +20,17 @@ export const createUser = ({ email, password }) => __awaiter(void 0, void 0, voi
         const SALT_COUNT = 10;
         const hashedPassword = yield bcrypt.hash(password, SALT_COUNT);
         const registrationTime = Date();
-        const users = db.collection('users');
-        const res = yield users.add({
-            email,
-            password: hashedPassword,
-            tokens: 10,
-            last_token_refresh: registrationTime
-        });
+        const { rows: [user] } = yield pool.query(`
+        INSERT INTO USERS (email, password, tokens, last_token_refresh)
+        VALUES ('${email}', '${hashedPassword}', ${10}, '${registrationTime}')
+        ON CONFLICT (email) DO NOTHING
+        RETURNING *;
+      `);
         return {
-            id: res.id,
-            email,
-            tokens: 10,
-            last_token_refresh: registrationTime
+            id: user.id,
+            email: user.email,
+            tokens: user.tokens,
+            last_token_refresh: user.last_token_refresh
         };
     }
     catch (err) {
@@ -41,33 +40,19 @@ export const createUser = ({ email, password }) => __awaiter(void 0, void 0, voi
 });
 export const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const docRef = db.collection('users').doc(userId);
-        const userDoc = yield docRef.get();
-        if (userDoc.empty)
+        const { rows: [user] } = yield pool.query(`
+        SELECT *
+        FROM users
+        WHERE id = ${userId};
+      `);
+        if (!user)
             return 'Error: No user found';
-        let user = userDoc.data();
-        Object.assign(user, { id: userDoc.id });
-        delete user.password;
-        return user;
-    }
-    catch (err) {
-        console.error(err);
-        return 'Database Error: Check logs';
-    }
-});
-export const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const users = db.collection('users');
-        const snapshot = yield users.where('email', '==', email).get();
-        if (!snapshot)
-            return 'Error: No user found';
-        let user = {};
-        snapshot.forEach((doc) => {
-            Object.assign(user, { id: doc.id });
-            Object.assign(user, doc.data());
-            delete user.password;
-        });
-        return user;
+        return {
+            id: user.id,
+            email: user.email,
+            tokens: user.tokens,
+            last_token_refresh: user.last_token_refresh
+        };
     }
     catch (err) {
         console.error(err);
@@ -76,16 +61,13 @@ export const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, funct
 });
 export const authenticateUser = ({ email, password }) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = db.collection('users');
-        const userDoc = yield users.where('email', '==', email).get();
-        if (userDoc.empty) {
+        const { rows: [user] } = yield pool.query(`
+      SELECT *
+      FROM users
+      WHERE email = '${email}';
+      `);
+        if (!user)
             return 'Error: No user found';
-        }
-        let user = {};
-        userDoc.forEach((doc) => {
-            Object.assign(user, { id: doc.id });
-            Object.assign(user, doc.data());
-        });
         const passwordMatch = yield bcrypt.compare(password, user.password);
         if (passwordMatch) {
             return {
@@ -106,13 +88,16 @@ export const authenticateUser = ({ email, password }) => __awaiter(void 0, void 
 });
 const isEmailTaken = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = db.collection('users');
-        const userDoc = yield users.where('email', '==', email).get();
-        if (userDoc.empty) {
-            return false;
+        const { rows: [user] } = yield pool.query(`
+        SELECT *
+        FROM users
+        WHERE email = '${email}';
+      `);
+        if (user) {
+            return true;
         }
         else {
-            return true;
+            return false;
         }
     }
     catch (err) {

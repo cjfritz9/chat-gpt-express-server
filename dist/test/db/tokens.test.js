@@ -8,8 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { expect } from 'chai';
-import * as TF from '../../db/tokens.js';
-import * as UF from '../../db/users.js';
+import * as TF from '../../db/postgres-old-db/tokens-pg.js';
+import * as UF from '../../db/postgres-old-db/users-pg.js';
 describe('User DB Functions Tests', () => {
     describe('Spend Token By User ID', () => {
         it('Spends a token when supplied valid information', () => __awaiter(void 0, void 0, void 0, function* () {

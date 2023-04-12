@@ -13,7 +13,7 @@ const tokensRouter = express.Router();
 tokensRouter.get('/:userId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params;
-        const response = yield getTokensByUserId(+userId);
+        const response = yield getTokensByUserId(userId);
         if (typeof response === 'string') {
             const error = response;
             res.send({
@@ -39,8 +39,8 @@ tokensRouter.post('/subtract', (req, res) => __awaiter(void 0, void 0, void 0, f
     try {
         const { userId, amount } = req.body;
         const response = amount === undefined
-            ? yield spendTokensByUserId(+userId)
-            : yield spendTokensByUserId(+userId, amount);
+            ? yield spendTokensByUserId(userId)
+            : yield spendTokensByUserId(userId, amount);
         if (typeof response === 'string') {
             const error = response;
             res.send({
@@ -65,7 +65,7 @@ tokensRouter.post('/subtract', (req, res) => __awaiter(void 0, void 0, void 0, f
 tokensRouter.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.body;
-        const response = yield refreshTokensByUserId({ userId: +userId });
+        const response = yield refreshTokensByUserId({ userId });
         if (typeof response === 'string') {
             const error = response;
             res.send({
